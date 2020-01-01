@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace BrainFuck_Compiler
 {
@@ -13,52 +11,43 @@ namespace BrainFuck_Compiler
         readonly static List<char> KeyWords = new List<char>() { '+', '-', '<', '>', '.', ',', '[', ']' };
         static void Main(string[] args)
         {
-            /*
-            int[] finds = Extensions.FindAllIndexof(args[1].AsEnumerable<char>(), ']');
-            for (int i = 0; i < finds.Length; i++)
-            {
-                Console.WriteLine(finds[i] + " " + Extensions.FindLast(args[1], finds[i]));
-            }
-            */
-            Run(args);
-        }
-        static void Run(string[] args)
-        {
             string inst = args[0];
             string input = "";
-            try
-            {
-                string content = Extensions.GetFile(args[1]);
-                //C# code
-                if (args[1].EndsWith("cs"))
-                {
-
-                }
-                //BrainFuck code
-                else
-                {
-                    input = content;
-                }
-            }
-            catch (IOException e)
-            {
-                input = args[1];
-            }
 
             if (inst.ToLower() == "from")
             {
                 //Convert BrainFuck to C#
                 //TODO: Implement this feature
+                try
+                {
+                    string content = Extensions.GetFile(args[1]);
+                    input = content;
+                }catch (IOException e)
+                {
+                    input = args[1];
+                }
             }
             else if (inst.ToLower() == "to")
             {
                 //Convert C# to BrainFuck
                 //TODO: Implemenet this feature
+                if(args[1].EndsWith("cs"))
+                {
+                    try
+                    {
+                        string content = Extensions.GetFile(args[1]);
+                        input = content;
+                    }catch(IOException e)
+                    {
+                        input = args[1];
+                    }
+                }else
+                {
+                    input = args[1];
+                }
             }
             else if (inst.ToLower() == "run")
             {
-                unsafe
-                {
                     //If they just want to run their brainfuck code
                     //Convert the BF code into a char array
                     var chinpt = input.ToCharArray();
@@ -107,6 +96,7 @@ namespace BrainFuck_Compiler
                                 case '[':
                                     if (stack[cursor] == 0)
                                     {
+                                        //Get index of next ]
                                         int next = Extensions.FindNext(new string(chinpt), i);
                                         if (next == -1)
                                         {
@@ -119,6 +109,7 @@ namespace BrainFuck_Compiler
                                 case ']':
                                     if (stack[cursor] != 0)
                                     {
+                                        //Get index of last [
                                         int last = Extensions.FindLast(new string(chinpt), i);
                                         if (last == -1)
                                         {
@@ -149,7 +140,6 @@ namespace BrainFuck_Compiler
                                     break;
                             }
                         }
-                    }
                 }
             }
         }
