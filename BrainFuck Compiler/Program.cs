@@ -11,7 +11,7 @@ namespace BrainFuck_Compiler
         readonly static List<char> KeyWords = new List<char>() { '+', '-', '<', '>', '.', ',', '[', ']' };
         static void Main(string[] args)
         {
-            Console.WriteLine(Extensions.getPermutations(0));
+            //Console.Write(Extensions.getPermutations(2));
             Run(args);
         }
         static void Run(string[] args)
@@ -19,7 +19,6 @@ namespace BrainFuck_Compiler
             string inst = args[0];
             string input = "";
             if (!args.Any()) { Console.WriteLine("You must enter args!");Console.WriteLine("Type help to recieve commands") ; return; }
-
             if (inst.ToLower() == "from")
             {
                 //Convert BrainFuck to C++
@@ -34,7 +33,7 @@ namespace BrainFuck_Compiler
                     input = args[1];
                 }
                 BrainFuck bf = new BrainFuck(input);
-                //Console.Write(bf.asString());
+                Console.Write(bf.asString());
             }
             else if (inst.ToLower() == "to")
             {
@@ -61,6 +60,7 @@ namespace BrainFuck_Compiler
             {
                 //If they just want to run their brainfuck code
                 //Convert the BF code into a char array
+                input = args[1];
                 var chinpt = input.ToCharArray();
                 //Define the stack (I doubt anyone's going over 30,000 addresses)
                 byte[] stack = new byte[30000];

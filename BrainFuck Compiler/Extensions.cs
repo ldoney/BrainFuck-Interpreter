@@ -63,9 +63,33 @@ namespace BrainFuck_Compiler
         public static string getPermutations(int index)
         {
             string res = "";
-            for (int i = 0; i <= index / 26; i++)
+            if (index < 26)
             {
-                res += ((char)(65 + (index * i % 26)));
+                res += (char)(65 + index);
+            }
+            else
+            {
+                for (int i = 0; i <= index / 26; i++)
+                {
+                    res += ((char)(65 + ((index * i) % 26)));
+                }
+            }
+            return res;
+        }
+        public static int getPlus(int index, string str)
+        {
+            char[] charArray = str.ToCharArray();
+            char toFind = charArray[index];
+            int res = 0;
+            char current = toFind;
+            while(true)
+            {
+                toFind = charArray[index + res];
+                if(toFind != current)
+                {
+                    break;
+                }
+                res++;
             }
             return res;
         }
