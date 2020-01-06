@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace BrainFuck_Compiler
+namespace BrainFuck_Interpreter
 {
     static class Extensions
     {
@@ -75,6 +75,13 @@ namespace BrainFuck_Compiler
                 }
             }
             return res;
+        }
+        public static void ClearCurrentConsoleLine()
+        {
+            int currentLineCursor = Console.CursorTop;
+            Console.SetCursorPosition(0, Console.CursorTop);
+            Console.Write(new string(' ', Console.WindowWidth));
+            Console.SetCursorPosition(0, currentLineCursor);
         }
         public static int getPlus(int index, string str)
         {
