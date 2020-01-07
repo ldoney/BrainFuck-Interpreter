@@ -6,131 +6,189 @@ namespace BrainFuck_Interpreter
 {
     class BrainFuck
     {
+        //The actual c++ code, start empty
         private string program = "";
-        private string bfcode;
-        public string asString()
+        
+        //The Brain Fuck code itself
+        private readonly string bfcode;
+
+        //Print out the generated c++ code
+        public string AsString()
         {
             return program;
         }
+
+        //Constructor, takes an input of BrainFuck code as a string
         public BrainFuck(string input)
         {
+            //Set the bfcode variable to be
             bfcode = input;
+
+            //C++ setup
             AddLine(0, 2, "#include <iostream>");
             AddLine(0, 2, "using namespace std;");
-//            AddLine(0, 1,       "char *d;");
-//            AddLine(0, 2,       "const char *p;");
             AddLine(0, 1,       "int main(){");
-            AddLine(1, 1,       "char data[30000] = {};");
+            //All of the variables needed for the c++ code
+            AddLine(1, 1,           "char data[30000] = {};");
             AddLine(1, 1,           "int i = 0;");
-            AddLine(0, 0,           interpret());  
+            AddLine(0, 0,           Interpret());  
+
             AddLine(0, 1,       "}");
         }
-        public string interpret()
+
+        //Interpret the actual code, return as a string
+        public string Interpret()
         {
+            //Increments to make the while loops looks pretty
             int inc = 0;
+
+            //Result, start empty
             string res = "";
-            string vardec = "";
+
+            //Loop through all of the BrainFuck code
             for (int i = 0; i < bfcode.Length; i++)
             {
+                //Find out what the code represents
                 switch (bfcode[i])
                 {
+                    //If its a +, generate code to append
                     case '+':
-                        int plu = Extensions.getPlus(i, bfcode);
+                        //Find the # of +s in a row to make the generated code cleaner
+                        int plu = Extensions.GetPlus(i, bfcode);
+
+                        //If there is more than one plus, do += instead to beautify it
                         if(plu != 1)
                         {
-                            res += MakeLine(3 + inc, 1, "data[i] += " + Extensions.getPlus(i, bfcode) + ";");
-                        }else
+                            res += MakeLine(3 + inc, 1, "data[i] += " + plu + ";");
+                        }
+
+                        //If there is only one plus, use ++ because it looks ugly to do += 1
+                        else
                         {
                             res += MakeLine(3 + inc, 1, "data[i]++;");
                         }
+
+                        //Increment the instruction to keep the code consistent
                         i += plu - 1; 
                         break;
+
+                    //If its a -, generate code to decrement
                     case '-':
-                        int min = Extensions.getPlus(i, bfcode);
-                        if(min != 1)
+                        //Find the # of -s in a row to make the generated code cleaner
+                        int min = Extensions.GetPlus(i, bfcode);
+
+                        //If there is more than one minus, do -= instead to beautify it
+                        if (min != 1)
                         {
-                            res += MakeLine(3 + inc, 1, "data[i] -= " + Extensions.getPlus(i, bfcode) + ";");
+                            res += MakeLine(3 + inc, 1, "data[i] -= " + min + ";");
                         }
+
+                        //If there is only one minus, use -- because it looks ugly to do -= 1
                         else
                         {
                             res += MakeLine(3 + inc, 1, "data[i]" + "--;");
                         }
+
+                        //Increment the instruction to keep the code consistent
                         i += min - 1;
                         break;
+
+                    //Given the increment pointer instruction, generate the code for increasing the pointer
                     case '>':
-                        int rig = Extensions.getPlus(i, bfcode);
+
+                        //Find the amount of >s in a row
+                        int rig = Extensions.GetPlus(i, bfcode);
+
+                        //If there is more than one >, do += instead to beautify it
                         if (rig != 1)
                         {
-                            res += MakeLine(3 + inc, 1, "i += " + Extensions.getPlus(i, bfcode) + ";");
+                            res += MakeLine(3 + inc, 1, "i += " + rig + ";");
                         }
+
+                        //If there is only one >, use ++ because it looks ugly to do += 1
                         else
                         {
                             res += MakeLine(3 + inc, 1, "i++;");
                         }
+
+                        //Increment the instruction to keep the code consistent
                         i += rig - 1;
                         break;
                     case '<':
-                        int lef = Extensions.getPlus(i, bfcode);
+
+                        //Find the # of <s in a row to make the generated code cleaner
+                        int lef = Extensions.GetPlus(i, bfcode);
+
+                        //If there is more than one minus, do -= instead to beautify it
                         if (lef != 1)
                         {
-                            res += MakeLine(3 + inc, 1, "i -= " + Extensions.getPlus(i, bfcode) + ";");
+                            res += MakeLine(3 + inc, 1, "i -= " + lef + ";");
                         }
+
+                        //If there is only one minus, use -- because it looks ugly to do -= 1
                         else
                         {
                             res += MakeLine(3 + inc, 1, "i--;");
                         }
+
+                        //Increment the instruction to keep the code consistent
                         i += lef - 1;
                         break;
-                    //if the byte at the data pointer is zero, then instead of moving the instruction pointer forward to the next command, jump it forward to the command after the matching ] command.
+
+                    //Essentially generating a while loop
                     case '[':
                         res += MakeLine(3 + inc, 1, "while(data[i] != 0)");
                         res += MakeLine(3 + inc, 1, "{");
                         inc++;
                         break;
-                        // if ptr != 0 move pointer >
-                        // if ptr == 0 go back
-                    //	if the byte at the data pointer is nonzero, then instead of moving the instruction pointer forward to the next command, jump it back to the command after the matching [ command.
+
+                    //Generating the end of a while loop
                     case ']':
-//                        res += MakeLine(3 + inc, 1, "if(data[i] != 0)");
-//                        res += MakeLine(3 + inc, 1, "{");
-//                        res += MakeLine(3 + inc, 1, "break;");
-//                        res += MakeLine(3 + inc, 1, "}");
                         inc--;
                         res += MakeLine(3 + inc, 1, "};");
                         break;
+
+                    //Generate a read line command
                     case ',':
                         res += MakeLine(3 + inc, 1, "cin >>" + "data[i]" + ";");
                         break;
+
+                    //Generate a command to print what's being pointed to
                     case '.':
                         res += MakeLine(3 + inc, 1, "cout << (char)" + "data[i]" + ";");
                         break;
+
+                    //Should never be called
                     default:
                         break;
                 }
             }
-//            for(int i = 0; i < vars.Count; i++)
-//            {
-//                vardec += MakeLine(3, 1, "int " + vars[i] + " = 0;");
-//            }
-            return vardec + res;
+            return res;
         }
-        public void AddLine(int indent, string text)
-        {
-            AddLine(indent, 1, text);
-        }
+        //This is to just standardize the code, this just adds to the code so it looks prettier up top
         public void AddLine(int indent, int nl, string text)
         {
-            
+            //Call MakeLine() as it performs the same function
             program += MakeLine(indent, nl, text);
         }
+
+        //More broad definition, it generates code with the amount of tabs and indentations to make
+        //generated code look pretty
         public string MakeLine(int indent, int nl, string text)
         {
+            //Create empty string
             string toAdd = "";
+
+            //Add amount of tabs
             for (int i = 0; i < indent; i++)
             {
                 toAdd += "\t";
             }
+
+            //Append on the text
             toAdd += text;
+
+            //Append the amount of newlines
             for (int i = 0; i < nl; i++)
             {
                 toAdd += "\n";

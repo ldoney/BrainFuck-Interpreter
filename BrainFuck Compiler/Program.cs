@@ -16,75 +16,134 @@ namespace BrainFuck_Interpreter
 {
     class Program
     {
+        //Use textreader if a file is to be read (Practically unused)
         static TextReader textreader = Console.In;
+
+        //List of keywords, really just a reassurance when reading the keywords
         readonly static List<char> KeyWords = new List<char>() { '+', '-', '<', '>', '.', ',', '[', ']' };
+
+        //The size for the stack's display
+        static int STACK_DIST = 10;
+
+        //Set the time for the program to sleep between steps 
+        static int SLEEP_TIME = 100;
+
         static void Main(string[] args)
         {
-            Run(args);
+            //This will allow me to debug if I need to test a method so I dont have to comment the whole code out
+            try
+            {
+                Run(args);
+            }catch(Exception e)
+            {
+                //In case there are any sort of exceptions to clean up the ugliness of a normal error
+                Console.WriteLine("Unexpected error!");
+            }
         }
         static void Run(string[] args)
         {
+            //If there were no arguments passed, stop the progrma
+            if (!args.Any())
+            {
+                Console.WriteLine("You must enter args!");
+                Console.WriteLine("Type help to recieve commands");
+                return;
+            }
+
+            //Get the instruction which the user wants to perform
+            //from: Converts BrainFuck code to c++ code
+            //to: (UNUSED), converts c++ code to BrainFuck
+            //run: Runs a bit of BrainFuck code
+            //step: Runs BrainFuck code and shows a display of what's happening
+            //help: Shows commands
             string inst = args[0];
+
+            //The code/File to use 
             string input = "";
-            if (!args.Any()) { Console.WriteLine("You must enter args!");Console.WriteLine("Type help to recieve commands") ; return; }
+
             if (inst.ToLower() == "from")
             {
                 //Convert BrainFuck to C++
 
+                //If the file exists, read it and make it input
                 try
                 {
+                    //Get the file relative to the run path and read its contents
                     string content = Extensions.GetFile(args[1]);
                     input = content;
                 }
+                //If the file doesn't exist, make the input be the string passed
                 catch (IOException e)
                 {
                     input = args[1];
                 }
+
+                //Create new BrainFuck object based on the input
                 BrainFuck bf = new BrainFuck(input);
-                Console.Write(bf.asString());
+                
+                //Print out the c++ version of the program
+                Console.Write(bf.AsString());
             }
             else if (inst.ToLower() == "to")
             {
                 //Convert C++ to BrainFuck
                 //TODO: Implement this feature
-                if (args[1].EndsWith("cs"))
+
+                //Only if the file is a cpp file, use it
+                if (args[1].EndsWith("cpp"))
                 {
+                    //If the file can be found, use it
                     try
                     {
                         string content = Extensions.GetFile(args[1]);
                         input = content;
                     }
+                    //If the file can't be found, don't use it
                     catch (IOException e)
                     {
                         input = args[1];
                     }
                 }
+                //A double check to input the c++ code
                 else
                 {
                     input = args[1];
                 }
             }else if(inst.ToLower() == "step" || inst.ToLower() == "run")
             {
+                //If they just want to run their brainfuck code
+                
+                //Just to clear up some of the code and make it prettier
                 Boolean step = false;
                 if(inst.ToLower() == "step")
                 {
                     step = true;
+                    //Clear the console to make the output pretty
+                    Console.Clear();
                 }
-                //If they just want to run their brainfuck code
+
+                //Part of the output, reads out how many instructions have been completed
+                int instructions = 0;
+
+                //Prints out the final string
+                string fin = "";
+
                 //Convert the BF code into a char array
                 input = args[1];
-                int instructions = 0;
                 var chinpt = input.ToCharArray();
+
                 //Define the stack (I doubt anyone's going over 30,000 addresses)
                 byte[] stack = new byte[30000];
+
                 //Define the entry point of the stack to the first address
                 int cursor = 0;
-                string fin = "";
+
                 //Loop through the input code
                 for (int i = 0; i < chinpt.Length; i++)
                 {
                     //Just to make it easier for me to debug
                     char kw = chinpt[i];
+
                     //Ensure that the code is not a comment or a space
                     if (KeyWords.Contains(kw))
                     {
@@ -123,10 +182,14 @@ namespace BrainFuck_Interpreter
                                 {
                                     //Get index of next ]
                                     int next = Extensions.FindNext(new string(chinpt), i);
+
+                                    //If there is no ] then throw an error
                                     if (next == -1)
                                     {
                                         throw new CompileError("Could not find next ]", stack[cursor]);
                                     }
+
+                                    //Append i to the next ]
                                     i = next;
                                 }
                                 break;
@@ -136,10 +199,14 @@ namespace BrainFuck_Interpreter
                                 {
                                     //Get index of last [
                                     int last = Extensions.FindLast(new string(chinpt), i);
+                                    
+                                    //If there is no [ then throw an error
                                     if (last == -1)
                                     {
                                         throw new CompileError("Could not find last [", stack[cursor]);
                                     }
+
+                                    //Append i to the next [
                                     i = last;
                                 }
                                 break;
@@ -159,54 +226,106 @@ namespace BrainFuck_Interpreter
                             //Print out whats at the address
                             case '.':
                                 //Write whats at the address
-                                Console.Write((char)stack[cursor]);
-                                fin += ((char)stack[cursor]);
+                                if(!step)
+                                {
+                                    Console.Write((char)stack[cursor]);
+                                }
+                                else
+                                {
+                                    fin += ((char)stack[cursor]);
+                                }
                                 break;
                             default:
                                 break;
                         }
                         if(step)
                         {
-                            int STACK_DIST = 10;
+                            //Sleep for SLEEP_TIME time
+                            Thread.Sleep(SLEEP_TIME);
 
-                            Thread.Sleep(1);
+                            //Clear the first line for the stack printout
                             Extensions.ClearCurrentConsoleLine();
+
+                            //Print out the stack delimetered by \t to keep it equidistant
                             for (int j = 0; j < STACK_DIST; j++)
                             {
                                 Console.Write(stack[j] + "\t");
+                                if(j == STACK_DIST - 1)
+                                {
+                                    Console.Write("\n");
+                                }
                             }
-                            Console.WriteLine("");
+
+                            //Clear the second line for the pointer printout
                             Extensions.ClearCurrentConsoleLine();
+
+                            //Print out the character representation of the string
                             for (int j = 0; j < STACK_DIST; j++)
                             {
+                                //Only print out actual ASCII characters (Some ASCII characters mess 
+                                //with newlines and tabs so they're a pain to work with)
                                 if(stack[j] >= 32 && stack[j] <= 126)
                                 {
                                     Console.Write(((char)stack[j]));
                                 }
                                 Console.Write("\t");
+                                if(j == STACK_DIST - 1)
+                                {
+                                    Console.Write("\n");
+                                }
                             }
-                            Console.WriteLine("");
+
+                            //Clear the pointer line
                             Extensions.ClearCurrentConsoleLine();
+                            
+                            //The amount of spaces
                             string spac = "";
                             for (int j = 0; j < cursor; j++)
                             {
                                 spac += "\t";
                             }
+
+                            //Append ^ to the end of the spaces
                             spac += "^";
+
+                            //Print out the spaces and a new line
                             Console.WriteLine(spac + "\n");
+
+                            //Print out the position in the code
+                            Extensions.ClearCurrentConsoleLine();
                             Console.WriteLine("Currently at position: " + i);
+
+                            //Print out the keyword it is currently executing
+                            Extensions.ClearCurrentConsoleLine();
                             Console.WriteLine("Executing: " + kw);
+
+                            //Increment the amount of instructions and print it out
                             instructions++;
+                            Extensions.ClearCurrentConsoleLine();
                             Console.WriteLine("i: " + instructions);
+
+                            //Print out the value of the point in the stack it is in
+                            Extensions.ClearCurrentConsoleLine();
                             Console.WriteLine("Pointing to: " + stack[cursor]);
+
+                            //Print out the index of the stack where the pointer is
+                            Extensions.ClearCurrentConsoleLine();
                             Console.WriteLine("Pointer: " + cursor);
+
+                            //Print the current output
+                            Extensions.ClearCurrentConsoleLine();
                             Console.WriteLine("Output: " + fin + "\n");
+
+                            //Reset the console
                             Console.SetCursorPosition(0,0);
                         }
                     }
                 }
-            }else if(inst.ToLower() == "help")
+            }
+            else if(inst.ToLower() == "help")
             {
+                //Printout for help (UNUSED AND UNFINISHED)
+                //TODO: Add in the implementation
                 Console.WriteLine("Commands:");
                 Console.WriteLine("from");
                 Console.Write("From");
@@ -217,11 +336,12 @@ namespace BrainFuck_Interpreter
             }
             else
             {
+                //If they have an unknown instruction, tell them
                 Console.Write("Invalid args!");
             }
         }
 
-
+        //Create a BrainFuck compilation error that I can throw if I want
         [Serializable]
         class CompileError : Exception
         {

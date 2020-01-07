@@ -5,6 +5,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>BrainFuck_Interpreter</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>BrainFuckInterpreter</AssemblyName>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
 
 </Project>

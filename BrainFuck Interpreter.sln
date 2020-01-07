@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrainFuck Interpreter", "BrainFuck Compiler\BrainFuck Interpreter.csproj", "{2BC675C5-8325-4CE8-ACDA-67555FE5FF13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrainFuckInterpreter", "BrainFuck Compiler\BrainFuckInterpreter.csproj", "{2BC675C5-8325-4CE8-ACDA-67555FE5FF13}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
