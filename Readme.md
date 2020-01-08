@@ -1,24 +1,14 @@
-# Foobar
+# BrainFuck Interpreter
 
-Foobar is a Python library for dealing with word pluralization.
+Brain Fuck Interpreter is a Command Line program which is used to run, convert, and step through Brain Fuck programs
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
-
-```bash
-pip install foobar
-```
+INCOMPLETE
 
 ## Usage
 
-```python
-import foobar
-
-foobar.pluralize('word') # returns 'words'
-foobar.pluralize('goose') # returns 'geese'
-foobar.singularize('phenomena') # returns 'phenomenon'
-```
+INCOMPLETE
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
@@ -26,4 +16,3 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 Please make sure to update tests as appropriate.
 
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
